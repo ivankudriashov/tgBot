@@ -7,30 +7,35 @@ pkg.config()
 
 const bot = new TelegramApi(process.env.BOT_TOKEN, {polling: true})
 
-const chats = {}
-
-const againOptions = {
+const startOptions = {
     reply_markup: JSON.stringify({
         inline_keyboard: [
-            [{text: 'Ищо рас', callback_data: '/again'}]
+            [{text: 'Нажьми минэ', callback_data: '/again'}]
         ]
     })
 }
 
 const startGame = async (chatId) => {
-    const ramdomNumberToImages = Math.floor(Math.random() * 43)
+    const ramdomNumberToImages = Math.floor(Math.random() * 41)
     const ramdomNumberToDescr = Math.floor(Math.random() * 11)
 
-    await bot.sendPhoto(chatId, images[ramdomNumberToImages])
-    return bot.sendMessage(chatId, descr[ramdomNumberToDescr], againOptions)
-}
+    const againOptions = {
+        caption: descr[ramdomNumberToDescr],
+        reply_markup: JSON.stringify({
+            inline_keyboard: [
+                [{text: 'Ищо рас', callback_data: '/again'}]
+            ]
+        })
+    }
 
+    return bot.sendPhoto(chatId, images[ramdomNumberToImages] , againOptions)
+}
 
 const start = () => {
     bot.setMyCommands([
         { command: '/start', description: 'Приветствие' },
         { command: '/info', description: 'Информация' },
-        { command: '/game', description: 'Игра' }
+        // { command: '/game', description: 'Игра' }
     ])
 
     bot.on('message', async msg => {
@@ -40,16 +45,16 @@ const start = () => {
     
         if(text === '/start') {
            await bot.sendSticker(chatId, 'https://chpic.su/_data/stickers/l/Lion_life/Lion_life_001.webp')
-           return bot.sendMessage(chatId, `Приветь ${user}! Приветь! Ты чиво ета, леф?`)
+           return bot.sendMessage(chatId, `Приветь ${user}! Приветь! Ты чиво ета, леф? Дэвэ ти нажмёщь на кнопуку а я тибэ пришлю кису`, startOptions)
         }
     
         if(text === '/info'){
             return bot.sendMessage(chatId, `Ета чатЪ щитобы падняц насраэниэ каторае упало`)
         }
-        if(text === '/game'){
-            await bot.sendMessage(chatId, `Ти нажми на кнопку а я тибэ пришлю льва`)
-            return startGame(chatId)
-        }
+        // if(text === '/game'){
+        //     await bot.sendMessage(chatId, `Ти нажми на кнопку а я тибэ пришлю льва`)
+        //     return startGame(chatId)
+        // }
 
         return bot.sendMessage(chatId, 'Я тоби нипанимаэ')
     })
@@ -58,9 +63,6 @@ const start = () => {
         const data = msg.data
         const chatId = msg.message.chat.id
 
-        
-
-    
         if(data === '/again'){
             return startGame(chatId)
         }
